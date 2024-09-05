@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.9.0
+    container_name: filebeat
+    user: root
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/var/log:ro
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    environment:
+      - "ELASTICSEARCH_HOSTS=http://dev.indusspay.com:9200"
+      - "ELASTICSEARCH_USERNAME=elastic"
+      - "ELASTICSEARCH_PASSWORD=indAdmin@123"
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.9.0
+    container_name: metricbeat
+    user: root
+    volumes:
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+    environment:
+      - "ELASTICSEARCH_HOSTS=http://dev.indusspay.com:9200"
+      - "ELASTICSEARCH_USERNAME=elastic"
+      - "ELASTICSEARCH_PASSWORD=indAdmin@123"
+    command: ["metricbeat", "-e", "-system.hostfs=/hostfs"]

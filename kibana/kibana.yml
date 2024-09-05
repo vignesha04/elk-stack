@@ -1,0 +1,17 @@
+#
+# ** THIS IS AN AUTO-GENERATED FILE **
+#
+# Default Kibana configuration for docker target
+server.host: "0.0.0.0"
+server.shutdownTimeout: "5s"
+elasticsearch.hosts: [ "http://dev.indusspay.com:9200" ]
+# Set the Elasticsearch username and password
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "indAdmin@123"
+
+server.publicBaseUrl: "http://kibana:5601"
+
+xpack.encryptedSavedObjects.encryptionKey: 3e23aa307eac1c626ac86cd2527d0242
+xpack.reporting.encryptionKey: ee61dae138b75b15ae4d4db2aaa4a822
+xpack.security.encryptionKey: 23f07d951d58722efbb7c29385194fca
+

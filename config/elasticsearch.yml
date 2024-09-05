@@ -1,0 +1,5 @@
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+xpack.security.enabled: true
+#xpack.security.encryption.algorithm: "AES/GCM/NoPadding"
+#xpack.security.encryption_key: "b9a9f2f6380918e1c92c5f900a06cb04"

@@ -1,0 +1,19 @@
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu
+    - memory
+    - network
+    - process
+    - process_summary
+    - diskio
+    - filesystem
+    - uptime
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+output.elasticsearch:
+  hosts: ["http://dev.indusspay.com:9200"]
+  username: "elastic"
+  password: "indAdmin@123"

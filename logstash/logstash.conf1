@@ -1,0 +1,83 @@
+input {
+#    file {
+#        path => "/logstash_dir/inlog.log"
+#        start_position => "beginning"
+#    }
+#    statsd {
+#      port => 8125
+#      codec => "json"
+#    }
+    udp {
+      port => 8125
+      codec => "json"
+      type => "kong"
+    }
+    gelf {
+        port => 12201
+        type => "docker"
+    } 
+}
+
+
+filter { 
+    if [type] == "docker" {
+        if ![container_name] {
+            mutate {
+                add_field => { "dynamic_index" => "kong" }
+            }
+        }
+        if [container_name] {
+            mutate {
+                add_field => { "dynamic_index" => "stag-%{container_name}" }
+            }
+        } 
+    } 
+    else{
+        mutate {
+            add_field => { "dynamic_index" => "kong_stats" }
+        }
+        if [message] =~ /^kong\./ {
+            grok {
+                match => {
+                    "message" => [
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>request_count):(?<request_count>[0-9]+)\|c$",
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>request_size):(?<request_size>[0-9]+)\|c$",
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>response_size):(?<response_size>[0-9]+)\|c$",
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>latency):(?<latency>[0-9]+)\|ms$",
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>upstream_latency):(?<upstream_latency>[0-9]+)\|ms$",
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>request_per_user):(?<request_per_user>[0-9]+)\|c$",
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>shdict_usage):(?<shdict_usage>[0-9]+)\|c$",
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>cache_datastore_hits_total):(?<cache_datastore_hits_total>[0-9]+)\|c$",
+                    "^kong\.(?<metric_type>[^\.]+)\.(?<service_name>[^\.]+)\.(?<metric_name>cache_datastore_misses_total):(?<cache_datastore_misses_total>[0-9]+)\|c$"
+                    ]
+                }
+            }
+            mutate {
+                convert => {
+                    "request_count" => "integer"
+                    "request_size" => "integer"
+                    "response_size" => "integer"
+                    "latency" => "integer"
+                    "upstream_latency" => "integer"
+                    "request_per_user" => "integer"
+                    "shdict_usage" => "integer"
+                    "cache_datastore_hits_total" => "integer"
+                    "cache_datastore_misses_total" => "integer"
+                }
+            }
+        }
+    }
+}
+
+output {  
+    stdout {
+      codec => rubydebug
+    }
+    elasticsearch {
+        hosts => ["dev.indusspay.com:9200"]
+        user => "elastic"
+        password => "indAdmin@123"
+        index => "%{dynamic_index}"  # Use the dynamic index field
+    }
+}
+

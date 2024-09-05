@@ -1,0 +1,23 @@
+
+version: '3.6'
+services:
+  fluent-bit:
+    image: fluent/fluent-bit:1.9
+    container_name: fluent-bit
+    restart: always
+    user: "0:0"
+    volumes:
+      - ./fluent-bit/:/fluent-bit/
+      - ./fluent-bit/logs/:/fluent-bit/logs/
+    ports:
+      - '2020:2020'
+    environment:
+      FLUENT_ELASTICSEARCH_HOST: elasticsearch
+      FLUENT_ELASTICSEARCH_PORT: 9200
+    command: /fluent-bit/bin/fluent-bit -c /fluent-bit/fluent-bit.conf
+    networks:
+      - elk
+
+networks:
+  elk:
+    external: true

@@ -1,0 +1,11 @@
+# apm-server.yml
+
+apm-server:
+  host: "0.0.0.0:8200"
+  rum:
+    enabled: true
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  username: "elastic"
+  password: "nO8chu91r@@"

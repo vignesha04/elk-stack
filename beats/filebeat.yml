@@ -1,0 +1,10 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/*.log
+
+output.elasticsearch:
+  hosts: ["http://dev.indusspay.com:9200"]
+  username: "elastic"
+  password: "indAdmin@123"
